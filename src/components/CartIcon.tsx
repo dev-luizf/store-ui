@@ -1,6 +1,6 @@
-import { Fragment } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
-import { XMarkIcon } from '@heroicons/react/24/outline'
+import React, { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 import { Product } from '../interfaces/Services';
 
 interface CartIconProps {
@@ -10,23 +10,26 @@ interface CartIconProps {
   setCartItems: (cartItems: Product[]) => void;
 }
 
-export default function CartIcon({ open, setOpen, cartItems, setCartItems }: CartIconProps) {
-  const cartTotal = (cartItems.reduce((acc, curr) => { return acc + curr.price}, 0)).toFixed(2);
+export default function CartIcon({
+  open, setOpen, cartItems, setCartItems,
+}: CartIconProps) {
+  const cartTotal = (cartItems.reduce((acc, curr) => acc + curr.price, 0)).toFixed(2);
 
   const removeFromCart = (id: string) => {
     if (cartItems) {
       const newCart = cartItems.filter((item: any) => item._id !== id);
-      localStorage.setItem("cartItems", JSON.stringify(newCart));
+      localStorage.setItem('cartItems', JSON.stringify(newCart));
       setCartItems(newCart);
     }
-  }
+  };
 
   return (
     <>
       <button
         className="pt-4 px-1 relative border-2 border-transparent text-gray-800 rounded-full hover:text-gray-400 focus:outline-none focus:text-gray-500 transition duration-150 ease-in-out"
         aria-label="Cart"
-        onClick={() => { setOpen(true)}}
+        onClick={() => { setOpen(true); }}
+        type="button"
       >
         <svg
           className="h- w-7"
@@ -37,7 +40,7 @@ export default function CartIcon({ open, setOpen, cartItems, setCartItems }: Car
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
         <span className="absolute inset-0 object-right-top -mr-6">
           <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-indigo-500 text-white">
@@ -97,7 +100,6 @@ export default function CartIcon({ open, setOpen, cartItems, setCartItems }: Car
                         <div className="mt-8">
                           <div className="flow-root">
                             <ul
-                              role="list"
                               className="-my-6 divide-y divide-gray-200"
                             >
                               {cartItems.map((product, index) => (
@@ -165,13 +167,15 @@ export default function CartIcon({ open, setOpen, cartItems, setCartItems }: Car
                         </div>
                         <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                           <p>
-                            or {' '}
+                            or
+                            {' '}
+                            {' '}
                             <button
                               type="button"
                               className="font-medium text-indigo-600 hover:text-indigo-500"
                               onClick={() => setOpen(false)}
                             >
-                               Continuar comprando
+                              Continuar comprando
                               <span aria-hidden="true"> &rarr;</span>
                             </button>
                           </p>

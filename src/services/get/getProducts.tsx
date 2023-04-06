@@ -5,6 +5,6 @@ export default async function getProducts(): Promise<{
   data: Product[];
   status: number;
 }> {
-  const { data, status } = await api.get(`/products`);
+  const { data, status } = await api.get('/products');
   return { data, status };
 }

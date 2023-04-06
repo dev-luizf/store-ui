@@ -1,9 +1,9 @@
-import { Fragment, useState } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { StarIcon } from "@heroicons/react/20/solid";
-import { Product } from "../interfaces/Services";
-import { useToast } from "../hooks/useToast";
+import React, { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import { StarIcon } from '@heroicons/react/20/solid';
+import { Product } from '../interfaces/Services';
+import { useToast } from '../hooks/useToast';
 
 interface ProductItemProps {
   product: Product;
@@ -11,20 +11,20 @@ interface ProductItemProps {
   setCartItems: (cartItems: Product[]) => void;
 }
 function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 export default function ProductDetails({ product, cartItems, setCartItems }: ProductItemProps) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
-  const addToCart = (product: Product) => {
-    setCartItems([...cartItems, product]);
-    localStorage.setItem("cartItems", JSON.stringify([...cartItems, product]));
-    toast.success("Produto adicionado ao carrinho.", {
-      theme: "light",
-      toastId: "success",
-    })
+  const addToCart = (item: Product) => {
+    setCartItems([...cartItems, item]);
+    localStorage.setItem('cartItems', JSON.stringify([...cartItems, item]));
+    toast.success('Produto adicionado ao carrinho.', {
+      theme: 'light',
+      toastId: 'success',
+    });
   };
 
   return (
@@ -111,14 +111,18 @@ export default function ProductDetails({ product, cartItems, setCartItems }: Pro
                                   <StarIcon
                                     key={rating}
                                     className={classNames(
-                                      "text-gray-900",
-                                      "h-5 w-5 flex-shrink-0"
+                                      'text-gray-900',
+                                      'h-5 w-5 flex-shrink-0',
                                     )}
                                     aria-hidden="true"
                                   />
                                 ))}
                               </div>
-                              <p className="sr-only">{4} out of 5 stars</p>
+                              <p className="sr-only">
+                                {4}
+                                {' '}
+                                out of 5 stars
+                              </p>
                               <a
                                 href="#"
                                 className="ml-3 text-sm font-medium text-indigo-600 hover:text-indigo-500"
