@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -81,7 +80,7 @@ export default function Home() {
           <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             {products.map((product) => {
               return (
-                <Link key={product._id} to="#" className="group">
+                <div key={product._id} className="group">
                   <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                     <img
                       src={product.thumbnail}
@@ -94,7 +93,7 @@ export default function Home() {
                   <p className="mt-1 text-lg font-medium text-gray-900">
                     {`R$ ${product.price}`}
                   </p>
-                </Link>
+                </div>
               );
             })}
           </div>
