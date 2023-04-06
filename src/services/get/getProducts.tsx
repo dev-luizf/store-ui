@@ -1,8 +1,8 @@
-import { Products } from '../../interfaces/Services';
+import { Product } from '../../interfaces/Services';
 import api from '../api';
 
 export default async function getProducts(): Promise<{
-  data: Products[];
+  data: Product[];
   status: number;
 }> {
   const { data, status } = await api.get(`/products`);
