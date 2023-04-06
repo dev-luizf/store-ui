@@ -13,7 +13,7 @@ type IProviderProps = {
 const ToastContext = createContext<IToastProps>({} as IToastProps);
 
 export function ToastProvider({ children }: IProviderProps) {
-  const toastValue = useMemo(() => (toast), []) as unknown as IToastProps;
+  const toastValue = useMemo(() => ({toast}), []) as unknown as IToastProps;
   return (
     <ToastContext.Provider value={toastValue}>
       {children}
