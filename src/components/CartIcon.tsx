@@ -4,13 +4,23 @@ import { XMarkIcon } from '@heroicons/react/24/outline'
 import { Product } from '../interfaces/Services';
 
 interface CartIconProps {
-  count: number;
   open: boolean;
   setOpen: (open: boolean) => void;
-  products: Product[];
+  cartItems: Product[];
+  setCartItems: (cartItems: Product[]) => void;
 }
 
-export default function CartIcon({ count, open, setOpen, products }: CartIconProps) {
+export default function CartIcon({ open, setOpen, cartItems, setCartItems }: CartIconProps) {
+  const cartTotal = (cartItems.reduce((acc, curr) => { return acc + curr.price}, 0)).toFixed(2);
+
+  const removeFromCart = (id: string) => {
+    if (cartItems) {
+      const newCart = cartItems.filter((item: any) => item._id !== id);
+      localStorage.setItem("cartItems", JSON.stringify(newCart));
+      setCartItems(newCart);
+    }
+  }
+
   return (
     <>
       <button
@@ -19,7 +29,7 @@ export default function CartIcon({ count, open, setOpen, products }: CartIconPro
         onClick={() => { setOpen(true)}}
       >
         <svg
-          className="h- w-6"
+          className="h- w-7"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -30,8 +40,8 @@ export default function CartIcon({ count, open, setOpen, products }: CartIconPro
           <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
         </svg>
         <span className="absolute inset-0 object-right-top -mr-6">
-          <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-red-500 text-white">
-            {count}
+          <div className="inline-flex items-center px-1.5 py-0.5 border-2 border-white rounded-full text-xs font-semibold leading-4 bg-indigo-500 text-white">
+            {cartItems.length}
           </div>
         </span>
       </button>
@@ -90,8 +100,8 @@ export default function CartIcon({ count, open, setOpen, products }: CartIconPro
                               role="list"
                               className="-my-6 divide-y divide-gray-200"
                             >
-                              {products.map((product) => (
-                                <li key={product._id} className="flex py-6">
+                              {cartItems.map((product, index) => (
+                                <li key={index} className="flex py-6">
                                   <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                                     <img
                                       src={product.thumbnail}
@@ -123,6 +133,7 @@ export default function CartIcon({ count, open, setOpen, products }: CartIconPro
                                         <button
                                           type="button"
                                           className="font-medium text-indigo-600 hover:text-indigo-500"
+                                          onClick={() => removeFromCart(product._id)}
                                         >
                                           Remover
                                         </button>
@@ -139,7 +150,7 @@ export default function CartIcon({ count, open, setOpen, products }: CartIconPro
                       <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                         <div className="flex justify-between text-base font-medium text-gray-900">
                           <p>Subtotal</p>
-                          <p>R$262.00</p>
+                          <p>{`R$ ${cartTotal}`}</p>
                         </div>
                         <p className="mt-0.5 text-sm text-gray-500">
                           O frete é calculado ao finalizar.

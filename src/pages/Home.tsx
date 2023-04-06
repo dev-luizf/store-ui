@@ -3,26 +3,38 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
-import { TextField } from "@mui/material";
+import { TextField, SelectChangeEvent, Button } from "@mui/material";
 
 import CartIcon from "../components/CartIcon";
 import { useToast } from "../hooks/useToast";
 import { Product } from "../interfaces/Services";
 import getProducts from "../services/get/getProducts";
 import ProductDetails from "../components/ProductDetails";
+import Loading from "../components/Loading";
+import Error from "../components/Error";
+
+type FilterType = "category" | "name";
 
 export default function Home() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [serviceError, setServiceError] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [categoryList, setCategoryList] = useState<string[]>([]);
   const [openCart, setOpenCart] = useState(false);
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("Todas");
+  const [cartList, setCartList] = useState<Product[]>([]);
 
   const fetchProducts = async () => {
     try {
       const { data } = await getProducts();
       setLoading(false);
       setProducts(data);
+      setFilteredProducts(data);
+      const categories = [...new Set(data.map((product) => product.category))];
+      setCategoryList(categories);
     } catch (error: any) {
       if (error?.response?.status === 404) {
         toast.error("Products not found.", {
@@ -33,11 +45,49 @@ export default function Home() {
     setLoading(false);
   };
 
+  const clearFilters = () => {
+    setCategory("Todas");
+    setName("");
+  }
+
+  const loadCartItems = () => {
+    const cartItems = localStorage.getItem("cartItems");
+    if (cartItems) {
+      const products = JSON.parse(cartItems);
+      setCartList(products);
+    }
+  };
+
+  const handleChange = (event: SelectChangeEvent, type: FilterType) => {
+    if (type === "category") {
+      setCategory(event.target.value);
+    } else {
+      setName(event.target.value);
+    }
+  };
+
+  useEffect(() => {
+    let newList = [];
+    newList = products.filter((product) => {
+      return product.name.toLowerCase().includes(name.toLowerCase());
+    });
+
+    if (category !== "Todas") {
+      newList = newList.filter((product) => {
+        return product.category === category;
+      });
+    }
+
+    setFilteredProducts(newList);
+  }, [name, category]);
+
   useEffect(() => {
     fetchProducts();
+    loadCartItems();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
+  if (serviceError) return <Error />;
 
   return (
     <>
@@ -47,29 +97,36 @@ export default function Home() {
           name="name"
           label="Buscar produtos"
           variant="standard"
-          // value={queryParams.name}
-          // onChange={(e) => handleChange(e as SelectChangeEvent<string>)}
+          value={name}
+          onChange={(e) => handleChange(e as SelectChangeEvent<string>, "name")}
         />
         <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
-          <InputLabel id="demo-simple-select-standard-label">
-            Categoria
-          </InputLabel>
+          <InputLabel id="category">Categoria</InputLabel>
           <Select
-            labelId="demo-simple-select-standard-label"
-            id="demo-simple-select-standard"
-            value={10}
-            // onChange={handleChange}
-            label="Age"
+            labelId="category"
+            id="category"
+            value={category}
+            onChange={(e) =>
+              handleChange(e as SelectChangeEvent<string>, "category")
+            }
           >
-            <MenuItem value={10}>Todas</MenuItem>
-            <MenuItem value={20}>Twenty</MenuItem>
-            <MenuItem value={30}>Thirty</MenuItem>
+            <MenuItem value="Todas">Todas</MenuItem>
+            {categoryList.map((category) => (
+              <MenuItem value={category}>{category}</MenuItem>
+            ))}
           </Select>
         </FormControl>
+        <button
+          type="button"
+          onClick={() => clearFilters()}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Limpar Filtros
+        </button>
         <CartIcon
-          count={1}
+          cartItems={cartList}
+          setCartItems={setCartList}
           open={openCart}
-          products={[products[0]]}
           setOpen={() => setOpenCart(!openCart)}
         />
       </div>
@@ -78,7 +135,7 @@ export default function Home() {
         <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
           <h2 className="sr-only">Products</h2>
           <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
-            {products.map((product) => {
+            {filteredProducts.map((product) => {
               return (
                 <div key={product._id} className="group">
                   <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
@@ -87,7 +144,11 @@ export default function Home() {
                       alt={product.name}
                       className="h-full w-full object-cover object-center group-hover:opacity-75"
                     />
-                    <ProductDetails product={product} />
+                    <ProductDetails
+                      product={product}
+                      cartItems={cartList}
+                      setCartItems={setCartList}
+                    />
                   </div>
                   <h3 className="mt-4 text-sm text-gray-700">{product.name}</h3>
                   <p className="mt-1 text-lg font-medium text-gray-900">

@@ -3,16 +3,29 @@ import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Product } from "../interfaces/Services";
+import { useToast } from "../hooks/useToast";
 
 interface ProductItemProps {
   product: Product;
+  cartItems: Product[];
+  setCartItems: (cartItems: Product[]) => void;
 }
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function ProductDetails({ product }: ProductItemProps) {
+export default function ProductDetails({ product, cartItems, setCartItems }: ProductItemProps) {
   const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+
+  const addToCart = (product: Product) => {
+    setCartItems([...cartItems, product]);
+    localStorage.setItem("cartItems", JSON.stringify([...cartItems, product]));
+    toast.success("Produto adicionado ao carrinho.", {
+      theme: "light",
+      toastId: "success",
+    })
+  };
 
   return (
     <>
@@ -121,6 +134,10 @@ export default function ProductDetails({ product }: ProductItemProps) {
                         <button
                           type="submit"
                           className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                          onClick={() => {
+                            addToCart(product);
+                            setOpen(false);
+                          }}
                         >
                           Adicionar ao carrinho
                         </button>
